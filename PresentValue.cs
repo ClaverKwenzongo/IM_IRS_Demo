@@ -11,7 +11,6 @@
             for (int i = col_start; i <= col_end; i += col_inc)
             {
                 double tau = Globals.Sheet9.Cells[row,i].Value;
-                //Globals.Sheet8.Cells[row, i + 1].Value = tau;
                 double df = getDiscount.getDFs(row, i);
                 double fwdRate = getForwards.getFwds(row, i);
 
