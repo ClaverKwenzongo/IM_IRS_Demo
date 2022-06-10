@@ -37,8 +37,6 @@
             this.tab1 = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
             this.Valuate = this.Factory.CreateRibbonButton();
-            this.findDiscountFs = this.Factory.CreateRibbonButton();
-            this.findFowardRates = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -53,8 +51,6 @@
             // group1
             // 
             this.group1.Items.Add(this.Valuate);
-            this.group1.Items.Add(this.findDiscountFs);
-            this.group1.Items.Add(this.findFowardRates);
             this.group1.Label = "group1";
             this.group1.Name = "group1";
             // 
@@ -63,18 +59,6 @@
             this.Valuate.Label = "Valuate";
             this.Valuate.Name = "Valuate";
             this.Valuate.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Valuate_Click);
-            // 
-            // findDiscountFs
-            // 
-            this.findDiscountFs.Label = "DiscountFactors";
-            this.findDiscountFs.Name = "findDiscountFs";
-            this.findDiscountFs.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.findDiscountFs_Click);
-            // 
-            // findFowardRates
-            // 
-            this.findFowardRates.Label = "ForwardRates";
-            this.findFowardRates.Name = "findFowardRates";
-            this.findFowardRates.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.findFowardRates_Click);
             // 
             // Ribbon1
             // 
@@ -95,8 +79,6 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Valuate;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton findDiscountFs;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton findFowardRates;
     }
 
     partial class ThisRibbonCollection

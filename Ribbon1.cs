@@ -94,8 +94,6 @@ namespace IM_IRS_Demo
                 //Define column end: this is so that we know when the last cashflow will be made.
                 int col_end = 0;
 
-                //Define the reset according to the pay_freguency
-                //int reset = 0;
                 if (pay_freq_.ToUpper() == "MONTHLY")
                 {
                     col_start_ = col_start(1);
@@ -129,41 +127,10 @@ namespace IM_IRS_Demo
                    double pv_fixed = PV.PV_fixed(notional_, row, col_start_, col_inc, col_end);
 
                    Globals.Sheet8.Cells[row, col-1].Value = pv_float / pv_fixed;
-                   //Globals.Sheet8.Cells[row, col - 1].Value = col_start_;
-                   //Globals.Sheet8.Cells[row, col].Value = col_inc;
-                  // Globals.Sheet8.Cells[row, col + 1].Value = col_end;
 
                 }
 
                 col++;
-            }
-        }
-
-        private void findDiscountFs_Click(object sender, RibbonControlEventArgs e)
-        {
-            int rows = countRows();
-            for (int i = 3; i < rows + 2; i++)
-            {
-                int j = 2;
-                while (string.IsNullOrWhiteSpace(Globals.Sheet3.Cells[i, j].Value?.ToString()) == false)
-                {
-                    Globals.Sheet4.Cells[i, j].Value = getDiscount.getDFs(i, j);
-                    j++;
-                }
-            }
-        }
-
-        private void findFowardRates_Click(object sender, RibbonControlEventArgs e)
-        {
-            int rows = countRows();
-            for (int i = 3; i < rows + 2; i++)
-            {
-                int j = 2;
-                while (string.IsNullOrWhiteSpace(Globals.Sheet3.Cells[i, j].Value?.ToString()) == false)
-                {
-                    Globals.Sheet5.Cells[i, j].Value = getForwards.getFwds(i, j);
-                    j++;
-                }
             }
         }
     }
