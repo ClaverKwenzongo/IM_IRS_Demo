@@ -37,6 +37,8 @@
             this.tab1 = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
             this.Valuate = this.Factory.CreateRibbonButton();
+            this.find_PV = this.Factory.CreateRibbonButton();
+            this.find_Portfolio_PV = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -51,6 +53,8 @@
             // group1
             // 
             this.group1.Items.Add(this.Valuate);
+            this.group1.Items.Add(this.find_PV);
+            this.group1.Items.Add(this.find_Portfolio_PV);
             this.group1.Label = "group1";
             this.group1.Name = "group1";
             // 
@@ -59,6 +63,18 @@
             this.Valuate.Label = "Valuate";
             this.Valuate.Name = "Valuate";
             this.Valuate.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Valuate_Click);
+            // 
+            // find_PV
+            // 
+            this.find_PV.Label = "Find PV";
+            this.find_PV.Name = "find_PV";
+            this.find_PV.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.find_PV_Click);
+            // 
+            // find_Portfolio_PV
+            // 
+            this.find_Portfolio_PV.Label = "Find Portfolio PV and VaR";
+            this.find_Portfolio_PV.Name = "find_Portfolio_PV";
+            this.find_Portfolio_PV.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.find_Portfolio_PV_Click);
             // 
             // Ribbon1
             // 
@@ -79,6 +95,8 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Valuate;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton find_PV;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton find_Portfolio_PV;
     }
 
     partial class ThisRibbonCollection

@@ -23,7 +23,7 @@
             return pv_float;
         }
 
-        public double PV_fixed( double notional, int row, int col_start, int col_inc, int col_end)
+        public double PV_fixed( double swap_rate, double notional, int row, int col_start, int col_inc, int col_end)
         {
             double pv_fixed = 0;
 
@@ -35,7 +35,7 @@
                 pv_fixed += notional*(tau/365)* df;
                 i += col_inc;
             }
-            return pv_fixed;
+            return pv_fixed*swap_rate;
         }
     }
 }
