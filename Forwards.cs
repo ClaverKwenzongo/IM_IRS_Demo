@@ -13,8 +13,8 @@
             }
             else
             {
-                double df_1 = Globals.Sheet4.Cells[row,col-1].Value;
-                double df_2 = Globals.Sheet4.Cells[row, col].Value;
+                double df_1 = get_df.getDFs(row,col-1);
+                double df_2 = get_df.getDFs(row,col);
                 double days_diff = Globals.Sheet9.Cells[row,col].Value - Globals.Sheet9.Cells[row, col - 1].Value;
 
                 FwdRate = (df_1/df_2 - 1)*(365/days_diff);

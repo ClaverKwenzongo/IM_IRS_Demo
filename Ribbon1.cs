@@ -34,25 +34,31 @@ namespace IM_IRS_Demo
 
             int start_col = 0;
 
-            int j = 1; //we exclude the first column of the worksheet because it is blank.
-            while (string.IsNullOrEmpty(Globals.Sheet3.Cells[1, j].Value?.ToString()) == false)
+            int j = 2; //we exclude the first column of the worksheet because it is blank.
+            while (string.IsNullOrWhiteSpace(Globals.Sheet3.Cells[1, j].Value?.ToString()) == false)
             {
-                if (pay_freq == 1)
+                if (Globals.Sheet3.Cells[1,j].Value == pay_freq)
                 {
                     start_col = j;
+                    break;
                 }
-                else if (pay_freq == 3)
+                else if (Globals.Sheet3.Cells[1, j].Value == pay_freq)
                 {
                     start_col = j;
+                    break;
                 }
-                else if (pay_freq == 6)
+                else if (Globals.Sheet3.Cells[1, j].Value == pay_freq)
                 {
                     start_col = j;
+                    break;
                 }
-                else if (pay_freq == 12)
+                else if (Globals.Sheet3.Cells[1, j].Value == pay_freq)
                 {
                     start_col = j;
+                    break;
                 }
+
+                j++;
             }
 
             return start_col;
@@ -66,11 +72,11 @@ namespace IM_IRS_Demo
 
         private void Valuate_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.Sheet8.Cells[1, 1].Value = "Hello Worlld";
+            //Globals.Sheet8.Cells[1, 1].Value = "Hello Worlld";
 
             int col = 3;  //Starting column for the data the user inputs in the home worksheet.
 
-            while(string.IsNullOrWhiteSpace(Globals.Sheet3.Cells[7, col].Value?.ToString()))
+            while(string.IsNullOrWhiteSpace(Globals.Sheet1.Cells[7, col].Value?.ToString()) == false)
             {
                 //Collect the data the user inputs from the home worksheet.
                 double tenor_ = Globals.Sheet1.Cells[7, col].Value;
@@ -94,25 +100,25 @@ namespace IM_IRS_Demo
                 {
                     col_start_ = col_start(1);
                     col_inc = 1;
-                    col_end = (int) (12 * tenor_); //For a 5 year swap with monthly payments, the last cashflow takes place at the month 12*5 = 60.
+                    col_end = col_start_ +  (int) (12 * tenor_); //For a 5 year swap with monthly payments, the last cashflow takes place at the month 12*5 = 60.
                 }
                 else if (pay_freq_.ToUpper() == "QUARTERLY")
                 {
                     col_start_ = col_start(3);
                     col_inc = 3;
-                    col_end = (int) (4 * tenor_);
+                    col_end = col_start_ +  (int) (4 * tenor_);
                 }
                 else if (pay_freq_.ToUpper() == "SEMI-ANNUALLY")
                 {
                     col_start_ = col_start(6);
                     col_inc = 6;
-                    col_end = (int) (2 * tenor_);
+                    col_end = col_start_ + (int) (2 * tenor_);
                 }
                 else if (pay_freq_.ToUpper() == "YEARLY")
                 {
                     col_start_ = col_start(12);
                     col_inc = 12;
-                    col_end = (int) tenor_;
+                    col_end = col_start_ + (int) tenor_;
                 }
 
                 int rowCount = countRows();
@@ -122,7 +128,11 @@ namespace IM_IRS_Demo
                    double pv_float = PV.PV_float(spread_,notional_,row,col_start_,col_inc,col_end);
                    double pv_fixed = PV.PV_fixed(notional_, row, col_start_, col_inc, col_end);
 
-                    Globals.Sheet8.Cells[row, col].Value = pv_float / pv_fixed;
+                   Globals.Sheet8.Cells[row, col-1].Value = pv_float / pv_fixed;
+                   //Globals.Sheet8.Cells[row, col - 1].Value = col_start_;
+                   //Globals.Sheet8.Cells[row, col].Value = col_inc;
+                  // Globals.Sheet8.Cells[row, col + 1].Value = col_end;
+
                 }
 
                 col++;
@@ -132,12 +142,12 @@ namespace IM_IRS_Demo
         private void findDiscountFs_Click(object sender, RibbonControlEventArgs e)
         {
             int rows = countRows();
-            for (int i = 3; i < rows+2; i++)
+            for (int i = 3; i < rows + 2; i++)
             {
                 int j = 2;
                 while (string.IsNullOrWhiteSpace(Globals.Sheet3.Cells[i, j].Value?.ToString()) == false)
                 {
-                    Globals.Sheet4.Cells[i, j].Value = getDiscount.getDFs(i,j);
+                    Globals.Sheet4.Cells[i, j].Value = getDiscount.getDFs(i, j);
                     j++;
                 }
             }
@@ -151,7 +161,7 @@ namespace IM_IRS_Demo
                 int j = 2;
                 while (string.IsNullOrWhiteSpace(Globals.Sheet3.Cells[i, j].Value?.ToString()) == false)
                 {
-                    Globals.Sheet5.Cells[i, j].Value = getForwards.getFwds(i,j);
+                    Globals.Sheet5.Cells[i, j].Value = getForwards.getFwds(i, j);
                     j++;
                 }
             }
