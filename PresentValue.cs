@@ -9,11 +9,11 @@
             double pv_float = 0;
 
             int i = col_start;
-            while (i <= col_end)
+            while (i < col_end + 1)
             {
                 double tau = Globals.Sheet9.Cells[row,i].Value;
                 double df = getDiscount.getDFs(row, i);
-                double fwdRate = getForwards.getFwds(row, i);
+                double fwdRate = getForwards.getFwds(row, i, col_inc, col_start);
                 double fwd_plus_spread = fwdRate + spread*(0.01/100); //The spread is multiplied by 0.01% to make a conversion from basis points.
 
                 pv_float += notional * fwd_plus_spread*(tau/365) * df;
@@ -28,7 +28,7 @@
             double pv_fixed = 0;
 
             int i = col_start;
-            while ( i <= col_end)
+            while ( i < col_end + 1)
             {
                 double tau = Globals.Sheet9.Cells[row, i].Value;
                 double df = getDiscount.getDFs(row, i);

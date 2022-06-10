@@ -72,8 +72,6 @@ namespace IM_IRS_Demo
 
         private void Valuate_Click(object sender, RibbonControlEventArgs e)
         {
-            //Globals.Sheet8.Cells[1, 1].Value = "Hello Worlld";
-
             int col = 3;  //Starting column for the data the user inputs in the home worksheet.
 
             while(string.IsNullOrWhiteSpace(Globals.Sheet1.Cells[7, col].Value?.ToString()) == false)
@@ -98,25 +96,25 @@ namespace IM_IRS_Demo
                 {
                     col_start_ = col_start(1);
                     col_inc = 1;
-                    col_end = col_start_ +  (int) (12 * tenor_); //For a 5 year swap with monthly payments, the last cashflow takes place at the month 12*5 = 60.
+                    col_end = 2 + (int)(col_inc * (12 * tenor_));  //For a 5 year swap with monthly payments, the last cashflow takes place at the month 12*5 = 60.
                 }
                 else if (pay_freq_.ToUpper() == "QUARTERLY")
                 {
                     col_start_ = col_start(3);
                     col_inc = 3;
-                    col_end = col_start_ +  (int) (4 * tenor_);
+                    col_end = 2 +  (int) (col_inc * (4 * tenor_));
                 }
                 else if (pay_freq_.ToUpper() == "SEMI-ANNUALLY")
                 {
                     col_start_ = col_start(6);
                     col_inc = 6;
-                    col_end = col_start_ + (int) (2 * tenor_);
+                    col_end = 2 + (int)(col_inc * (6 * tenor_));
                 }
                 else if (pay_freq_.ToUpper() == "YEARLY")
                 {
                     col_start_ = col_start(12);
                     col_inc = 12;
-                    col_end = col_start_ + (int) tenor_;
+                    col_end = 2 + (int)(col_inc * tenor_);
                 }
 
                 int rowCount = countRows();
