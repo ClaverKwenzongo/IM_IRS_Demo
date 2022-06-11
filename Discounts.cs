@@ -13,7 +13,7 @@ namespace IM_IRS_Demo
 
             double df = Math.Pow(Math.E, -rate * days/365);  //For continuously compounded 
 
-            return Math.Round(df, 9);
+            return df;
         }
 
     }
