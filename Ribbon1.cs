@@ -204,8 +204,13 @@ namespace IM_IRS_Demo
             List<double> portfolio_pv = new List<double>();
             /////////////////////////////////////////////////////////////////////////
 
+            //EWMA weights: this list stores the weights used in implementing EWMA
+            List<double> ewma_returns = new List<double>();
+            //////////////////////////////////////////////////////////////////////////
+
 
             int rows = countRows();
+
             for (int row = 3; row < rows + 2; row++)
             {
                 int col = 11;
@@ -216,7 +221,24 @@ namespace IM_IRS_Demo
                     col++;
                 }
                 portfolio_pv.Add(pv_sum);
-                Globals.Sheet8.Cells[row, 20].Value = pv_sum;  
+                Globals.Sheet8.Cells[row, 20].Value = pv_sum;
+            }
+
+            //Finding the portfolio Profit and Loss:
+            int i_row = 4;
+            int exp = 0;
+            double lambda = Globals.Sheet1.Cells[14, 4].Value;  //Defined Lambda in the home worksheet
+            double weights = 0;
+            double return_squared = 0;
+            while (string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[i_row,20].Value?.ToString()) == false)
+            {
+                weights = (1 - lambda) * Math.Pow(lambda, exp);
+                return_squared = Math.Pow(Globals.Sheet8.Cells[i_row - 1,20].Value - Globals.Sheet8.Cells[i_row,20].Value, 2);
+                Globals.Sheet8.Cells[i_row, 22].Value = return_squared;
+                ewma_returns.Add(weights*return_squared);
+
+                exp++;
+                i_row++;
             }
         }
     }
