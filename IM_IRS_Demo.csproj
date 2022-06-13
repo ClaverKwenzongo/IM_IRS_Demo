@@ -103,6 +103,7 @@
   <ItemGroup>
     <Compile Include="Discounts.cs" />
     <Compile Include="Forwards.cs" />
+    <Compile Include="getPercentile1.cs" />
     <Compile Include="PresentValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ribbon1.cs">

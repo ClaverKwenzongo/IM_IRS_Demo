@@ -1,6 +1,7 @@
 ﻿using Microsoft.Office.Tools.Ribbon;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace IM_IRS_Demo
         Discounts getDiscount = new Discounts();
         Forwards getForwards = new Forwards();
         PresentValue PV = new PresentValue();
+        getPercentile percentile_func = new getPercentile();
         public int countRows()
         {
             //Count how many rows of data they are:
@@ -24,6 +26,36 @@ namespace IM_IRS_Demo
             }
 
             return count;
+        }
+
+        static DateTime getDate(string _date)
+        {
+            CultureInfo cultureInfo = new CultureInfo("en-US");
+            DateTime wsDate = DateTime.Parse(_date, cultureInfo);
+
+            return wsDate;
+        }
+
+        //This function will return the number of rows we need to filter out the data corresponding to the given lookback period.
+        public int end_row(string lookback_string)
+        {
+            int endRow = 0;
+            int j = 1;
+            DateTime lookback_date = getDate(lookback_string);
+            while(string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[j, 1].Value?.ToString()) == false)
+            {
+                DateTime date_check = getDate(Globals.Sheet8.Cells[j,1].Value.ToString());
+                if (date_check == lookback_date)
+                {
+                    break;
+                }
+                else
+                {
+                    endRow++;
+                }
+            }
+
+            return endRow;
         }
 
         public int col_start(int pay_freq)
@@ -182,9 +214,24 @@ namespace IM_IRS_Demo
                     col_end = 2 + (int)(col_inc * tenor_);
                 }
 
-                int rowCount = countRows();
                 //Now we find the present value with the swap rate fixed to the swap rate calculated at evaluation date.
-                double eval_swap_rate = Globals.Sheet8.Cells[3, col-1].Value;
+                double eval_swap_rate = 0;
+                DateTime Eval_date = getDate(Globals.Sheet1.Cells[4, 3].Value.ToString());
+                int date_row = 3;
+                while (string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[date_row, 1].Value?.ToString()) == false)
+                {
+                    DateTime ws_date = getDate(Globals.Sheet8.Cells[date_row, 1].Value.ToString());
+                    if ( ws_date == Eval_date )
+                    {
+                        eval_swap_rate = Globals.Sheet8.Cells[date_row, col - 1].Value;
+                        break;
+                    }
+                    date_row++;
+                }
+
+                //Globals.Sheet8.Cells[1,1].Value = eval_swap_rate;
+
+                int rowCount = countRows();
 
                 for (int row = 3; row < rowCount + 2; row++)
                 {
@@ -250,5 +297,45 @@ namespace IM_IRS_Demo
                 i_row++;
             }
         }
+
+        private void find_VaR_Click(object sender, RibbonControlEventArgs e)
+        {
+
+            //Calculate VaR
+            List<double> scaled_returns = new List<double>();
+            List<double> unscalled_returns = new List<double>();
+
+            int row_date = 4; //Start in row=4 because there is no return for the most recent date. For generality, this should be initialized as "row_eval_date + 1".
+            DateTime unscalled_lookback_date = getDate(Globals.Sheet1.Cells[4, 9].Value.ToString());
+            DateTime scalled_lookback_date = getDate(Globals.Sheet1.Cells[4, 6].Value.ToString());
+            double scaled_return_ = 0;
+            while (string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[row_date, 1].Value?.ToString()) == false)
+            {
+                DateTime ws_lookback_date = getDate(Globals.Sheet8.Cells[row_date, 1].Value.ToString());
+                //Apply a filter to select only those scaled returns and unscalled returns that are within the given lookback period.
+                if (ws_lookback_date >= scalled_lookback_date)
+                {
+                    //For the scaled return lookback up to 5 years
+                    scaled_return_ = Globals.Sheet8.Cells[row_date, 24].Value;
+                    scaled_returns.Add(scaled_return_);
+                }
+                else
+                {
+                    break;
+                }
+
+                row_date++;
+            }
+
+            double[] scaled_returns_array = scaled_returns.ToArray();
+
+            Globals.Sheet1.Cells[26, 6].Value = percentile_func.Percentile(scaled_returns_array, 0.001);
+        }
     }
 }
+
+//to do:
+//The code must be able to pick up the evaluation date from the one the user inputs. So that when we need to caculate the PnL, the PnL for the cells corresponding to the row of
+//the evaluation date must be null.
+
+//Also, the code must be able select the starting row that corresponds to the row of the date picked as the evaluation date + 1.

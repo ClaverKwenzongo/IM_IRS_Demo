@@ -39,6 +39,7 @@
             this.Valuate = this.Factory.CreateRibbonButton();
             this.find_PV = this.Factory.CreateRibbonButton();
             this.find_Portfolio_PV = this.Factory.CreateRibbonButton();
+            this.find_VaR = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -55,6 +56,7 @@
             this.group1.Items.Add(this.Valuate);
             this.group1.Items.Add(this.find_PV);
             this.group1.Items.Add(this.find_Portfolio_PV);
+            this.group1.Items.Add(this.find_VaR);
             this.group1.Label = "group1";
             this.group1.Name = "group1";
             // 
@@ -72,9 +74,15 @@
             // 
             // find_Portfolio_PV
             // 
-            this.find_Portfolio_PV.Label = "Find Portfolio PV and VaR";
+            this.find_Portfolio_PV.Label = "Find Portfolio PV";
             this.find_Portfolio_PV.Name = "find_Portfolio_PV";
             this.find_Portfolio_PV.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.find_Portfolio_PV_Click);
+            // 
+            // find_VaR
+            // 
+            this.find_VaR.Label = "VaR";
+            this.find_VaR.Name = "find_VaR";
+            this.find_VaR.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.find_VaR_Click);
             // 
             // Ribbon1
             // 
@@ -97,6 +105,7 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Valuate;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton find_PV;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton find_Portfolio_PV;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton find_VaR;
     }
 
     partial class ThisRibbonCollection
