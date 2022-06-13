@@ -233,8 +233,10 @@ namespace IM_IRS_Demo
             while (string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[i_row,20].Value?.ToString()) == false)
             {
                 weights = (1 - lambda) * Math.Pow(lambda, exp);
-                return_squared = Math.Pow(Globals.Sheet8.Cells[i_row - 1,20].Value - Globals.Sheet8.Cells[i_row,20].Value, 2);
+                return_squared = Math.Pow((Globals.Sheet8.Cells[i_row - 1,20].Value - Globals.Sheet8.Cells[i_row,20].Value)/(Globals.Sheet8.Cells[i_row,20].Value), 2);
                 Globals.Sheet8.Cells[i_row, 22].Value = return_squared;
+
+                Globals.Sheet8.Cells[i_row, 23].Value = weights*return_squared;
                 ewma_returns.Add(weights*return_squared);
 
                 exp++;
