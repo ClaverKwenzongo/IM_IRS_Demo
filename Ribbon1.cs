@@ -230,13 +230,20 @@ namespace IM_IRS_Demo
             double lambda = Globals.Sheet1.Cells[14, 4].Value;  //Defined Lambda in the home worksheet
             double weights = 0;
             double return_squared = 0;
+            double returns = 0;
             while (string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[i_row,20].Value?.ToString()) == false)
             {
                 weights = (1 - lambda) * Math.Pow(lambda, exp);
-                return_squared = Math.Pow((Globals.Sheet8.Cells[i_row - 1,20].Value - Globals.Sheet8.Cells[i_row,20].Value)/(Globals.Sheet8.Cells[i_row,20].Value), 2);
-                Globals.Sheet8.Cells[i_row, 22].Value = return_squared;
+                returns = (Globals.Sheet8.Cells[i_row - 1, 20].Value - Globals.Sheet8.Cells[i_row, 20].Value) / Globals.Sheet8.Cells[i_row, 20].Value;
 
-                Globals.Sheet8.Cells[i_row, 23].Value = weights*return_squared;
+                //Portfolio PnL:
+                Globals.Sheet8.Cells[i_row, 22].Value = returns;
+
+                //Square the portfolio PnL:
+                return_squared = Math.Pow(returns, 2);
+
+                //Weight the squared portfolio PnL:
+                Globals.Sheet8.Cells[i_row, 24].Value = weights*return_squared;
                 ewma_returns.Add(weights*return_squared);
 
                 exp++;
