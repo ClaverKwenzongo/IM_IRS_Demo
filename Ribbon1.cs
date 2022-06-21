@@ -28,6 +28,20 @@ namespace IM_IRS_Demo
             return count;
         }
 
+        //Calculate the total amount exposed by summing the notional of every IRS:
+        public double total_exposure()
+        {
+            int col = 3;
+            double total = 0;
+            while(string.IsNullOrWhiteSpace(Globals.Sheet1.Cells[8,col].Value?.ToString()) == false)
+            {
+                total += Globals.Sheet1.Cells[8,col].Value;
+                col++;
+            }
+
+            return total;
+        }
+
         static DateTime getDate(string _date)
         {
             CultureInfo cultureInfo = new CultureInfo("en-US");
@@ -37,15 +51,15 @@ namespace IM_IRS_Demo
         }
 
         //This function will return the number of rows we need to filter out the data corresponding to the given lookback period.
-        public int end_row(string lookback_string)
+        public int end_row(DateTime lookback_date)
         {
-            int endRow = 0;
-            int j = 1;
-            DateTime lookback_date = getDate(lookback_string);
+            int endRow = 3;
+            int j = 3;
+            //DateTime lookback_date = getDate(lookback_string);
             while(string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[j, 1].Value?.ToString()) == false)
             {
                 DateTime date_check = getDate(Globals.Sheet8.Cells[j,1].Value.ToString());
-                if (date_check == lookback_date)
+                if (date_check < lookback_date)
                 {
                     break;
                 }
@@ -53,9 +67,17 @@ namespace IM_IRS_Demo
                 {
                     endRow++;
                 }
+                j++;
             }
 
             return endRow;
+        }
+
+        //This is a function that computes the daily volatility. The volatility floor given in the home spreadsheet is used as the volatility on the last day.
+        public double ewma_vol(double vol_0 , double return_0 , double lambda)
+        {
+            double vol = lambda*Math.Pow(vol_0 , 2) + (1-lambda)*Math.Pow(return_0, 2);
+            return vol;
         }
 
         public int col_start(int pay_freq)
@@ -229,8 +251,6 @@ namespace IM_IRS_Demo
                     date_row++;
                 }
 
-                //Globals.Sheet8.Cells[1,1].Value = eval_swap_rate;
-
                 int rowCount = countRows();
 
                 for (int row = 3; row < rowCount + 2; row++)
@@ -247,15 +267,6 @@ namespace IM_IRS_Demo
         {
             //onclick this button calculates the PV of the portfolio by summing the daily PV of the individual IRS products.
 
-            //This is the list to use as an input to pass in the percentile function.
-            List<double> portfolio_pv = new List<double>();
-            /////////////////////////////////////////////////////////////////////////
-
-            //EWMA weights: this list stores the weights used in implementing EWMA
-            List<double> ewma_returns = new List<double>();
-            //////////////////////////////////////////////////////////////////////////
-
-
             int rows = countRows();
 
             for (int row = 3; row < rows + 2; row++)
@@ -267,39 +278,30 @@ namespace IM_IRS_Demo
                     pv_sum += Globals.Sheet8.Cells[row, col].Value;
                     col++;
                 }
-                portfolio_pv.Add(pv_sum);
                 Globals.Sheet8.Cells[row, 20].Value = pv_sum;
             }
 
             //Finding the portfolio Profit and Loss:
             int i_row = 4;
-            int exp = 0;
-            double lambda = Globals.Sheet1.Cells[14, 4].Value;  //Defined Lambda in the home worksheet
-            double weights = 0;
-            double return_squared = 0;
             double returns = 0;
+
             while (string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[i_row,20].Value?.ToString()) == false)
             {
-                weights = (1 - lambda) * Math.Pow(lambda, exp);
+                //weights = (1 - lambda) * Math.Pow(lambda, exp);
                 returns = (Globals.Sheet8.Cells[i_row - 1, 20].Value - Globals.Sheet8.Cells[i_row, 20].Value) / Globals.Sheet8.Cells[i_row, 20].Value;
 
                 //Portfolio PnL:
                 Globals.Sheet8.Cells[i_row, 22].Value = returns;
 
-                //Square the portfolio PnL:
-                return_squared = Math.Pow(returns, 2);
-
-                //Weight the squared portfolio PnL:
-                Globals.Sheet8.Cells[i_row, 24].Value = weights*return_squared;
-                ewma_returns.Add(weights*return_squared);
-
-                exp++;
                 i_row++;
             }
         }
 
         private void find_VaR_Click(object sender, RibbonControlEventArgs e)
         {
+            //EWMA weights: this list stores the weights used in implementing EWMA
+            List<double> ewma_vol_lst = new List<double>();
+            //////////////////////////////////////////////////////////////////////////
 
             //Calculate VaR
             List<double> scaled_returns = new List<double>();
@@ -309,27 +311,57 @@ namespace IM_IRS_Demo
             DateTime unscalled_lookback_date = getDate(Globals.Sheet1.Cells[4, 9].Value.ToString());
             DateTime scalled_lookback_date = getDate(Globals.Sheet1.Cells[4, 6].Value.ToString());
             double scaled_return_ = 0;
+
+            int rows = countRows();
+            double vol_floor = Globals.Sheet1.Cells[15, 4].Value;
+            Globals.Sheet8.Cells[rows + 1, 24].Value = vol_floor;
+
+            double lambda = Globals.Sheet1.Cells[14, 4].Value;  //Defined Lambda in the home worksheet
+
+            double return_0 = 0;
+            int i = 0;
             while (string.IsNullOrWhiteSpace(Globals.Sheet8.Cells[row_date, 1].Value?.ToString()) == false)
             {
-                DateTime ws_lookback_date = getDate(Globals.Sheet8.Cells[row_date, 1].Value.ToString());
-                //Apply a filter to select only those scaled returns and unscalled returns that are within the given lookback period.
-                if (ws_lookback_date >= scalled_lookback_date)
-                {
-                    //For the scaled return lookback up to 5 years
-                    scaled_return_ = Globals.Sheet8.Cells[row_date, 24].Value;
-                    scaled_returns.Add(scaled_return_);
-                }
-                else
-                {
-                    break;
-                }
+
+                //Get daily volatilities:
+                return_0 = Globals.Sheet8.Cells[rows - i + 1, 22].Value;
+                double vol = ewma_vol(Globals.Sheet8.Cells[rows - i + 1, 24].Value, return_0, lambda);
+                Globals.Sheet8.Cells[rows - i, 24].Value = Math.Max(vol, vol_floor);
 
                 row_date++;
+                i++;
+            }
+
+            double num_vol = Globals.Sheet8.Cells[3, 24].Value;
+            double factor = 0;
+
+            for (int k = 4; k < rows+2; k++)
+            {
+                DateTime ws_date = getDate(Globals.Sheet8.Cells[k,1].Value.ToString());
+                double den_vol = Globals.Sheet8.Cells[k, 24].Value;
+
+                factor = num_vol / den_vol;
+                Globals.Sheet8.Cells[k, 26].Value = factor * Globals.Sheet8.Cells[k, 22].Value;
+                double scaled_return = Globals.Sheet8.Cells[k, 26].Value;
+                double unscalled_return = Globals.Sheet8.Cells[k, 22].Value;
+
+                if (ws_date >= scalled_lookback_date && ws_date >= unscalled_lookback_date)
+                {
+                    scaled_returns.Add(scaled_return);
+                    unscalled_returns.Add(unscalled_return);
+                }
+                else if (ws_date < scalled_lookback_date && ws_date >= unscalled_lookback_date)
+                {
+                    unscalled_returns.Add(unscalled_return);
+                }
             }
 
             double[] scaled_returns_array = scaled_returns.ToArray();
+            double[] unscaled_returns_array = unscalled_returns.ToArray();
 
-            Globals.Sheet1.Cells[26, 6].Value = percentile_func.Percentile(scaled_returns_array, 0.001);
+            Globals.Sheet1.Cells[26, 6].Value = percentile_func.Percentile(scaled_returns_array, 0.001)*Math.Sqrt(5);
+            Globals.Sheet1.Cells[26, 9].Value = percentile_func.Percentile(unscaled_returns_array, 0.001) * Math.Sqrt(5);
+            Globals.Sheet1.Cells[26, 3].Value = (0.75*Globals.Sheet1.Cells[26,6].Value + 0.25*Globals.Sheet1.Cells[26,9].Value)*total_exposure();
         }
     }
 }

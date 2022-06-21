@@ -80,7 +80,7 @@
             // 
             // find_VaR
             // 
-            this.find_VaR.Label = "VaR";
+            this.find_VaR.Label = "FVaR";
             this.find_VaR.Name = "find_VaR";
             this.find_VaR.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.find_VaR_Click);
             // 
